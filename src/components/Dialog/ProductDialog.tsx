@@ -74,7 +74,13 @@ const ProductDialog: React.FC<ProductDialogProps> = ({ dialogData, handleClose }
 
   // ✅ Define Update Mutation
   const { mutate: updateProduct } = UpdateProduct.useMutation({
-    
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["getProductList"] });
       toast({
