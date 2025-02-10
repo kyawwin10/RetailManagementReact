@@ -5,20 +5,22 @@ import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const DrawerContext = React.createContext<{ direction?: 'right' | 'top' | 'bottom' | 'left' }>({
-  direction: 'left',
+  direction: 'right',
 });
 
 const Drawer = ({
   shouldScaleBackground = true,
-  direction = 'left',
+  direction = 'right',
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Root>) => (
   <DrawerContext.Provider value={{ direction }}>
-    <DrawerPrimitive.Root
-      shouldScaleBackground={shouldScaleBackground}
-      direction={direction}
-      {...props}
-    />
+    <div className='md:block'> {/* Hide Drawer on Desktop */}
+      <DrawerPrimitive.Root
+        shouldScaleBackground={shouldScaleBackground}
+        direction={direction}
+        {...props}
+      />
+    </div>
   </DrawerContext.Provider>
 );
 Drawer.displayName = 'Drawer';
@@ -33,21 +35,23 @@ const DrawerOverlay = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
-  <DrawerPrimitive.Overlay
-    ref={ref}
-    className={cn('fixed inset-0 z-50 bg-black/80', className)}
-    {...props}
-  />
+  <div className='md:hidden'>
+    <DrawerPrimitive.Overlay
+      ref={ref}
+      className={cn('fixed inset-0 z-50 bg-black/80', className)}
+      {...props}
+    />
+  </div>
 ));
 DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName;
 
 const drawerContentVariants = cva('fixed z-50 flex h-auto flex-col border bg-background', {
   variants: {
     direction: {
-      right: 'ml-24 right-0 inset-y-0',
+      right: 'ml-24 right-0 inset-y-0 w-[72vw]',
       top: 'mb-24 top-0 inset-x-0',
       bottom: 'mt-24 bottom-0 inset-x-0',
-      left: 'mr-24 left-0 inset-y-0',
+      left: 'mr-24 left-0 inset-y-0 w-[80vw]',
     },
   },
   defaultVariants: {
@@ -64,14 +68,16 @@ const DrawerContent = React.forwardRef<
   return (
     <DrawerPortal>
       <DrawerOverlay />
-      <DrawerPrimitive.Content
-        ref={ref}
-        className={cn(drawerContentVariants({ direction, className }))}
-        {...props}
-      >
-        {/* <div className='mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted' /> */}
-        {children}
-      </DrawerPrimitive.Content>
+      <div className='md:hidden'> {/* Hide Drawer Content on Desktop */}
+        <DrawerPrimitive.Content
+          ref={ref}
+          className={cn(drawerContentVariants({ direction, className }))}
+          {...props}
+        >
+          {/* <div className='mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted' /> */}
+          {children}
+        </DrawerPrimitive.Content>
+      </div>
     </DrawerPortal>
   );
 });
